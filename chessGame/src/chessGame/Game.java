@@ -3,64 +3,97 @@ import pawns.*;
 
 import java.awt.EventQueue;
 
+import gui.ChessBoard;
+import gui.ChessboardSpot;
+import gui.GameLog;
+import gui.MenuBar;
 import gui.Square;
+import gui.Window;
 import pawns.GameRules;
 import java.io.*;
 
-
+/**
+ * Klasa {@link Game} odpowiada za kontrolê menu, szachownicy oraz samej gry w szachy.
+ *	Zawiera takie pola jak:<br>
+ *	{@link FrameManager} - kontroler aplikacji <br>
+ *	{@link GameRules} - kontrola zasad gry <br>
+*	round - licznik rund
+*	gameStart - informacja o stanie gry
+*	counMoves - licznik ruchów
+ *	options - mo¿liwe ruchy danej bierki<br>
+ */ 
 public class Game {
 	
 	public FrameManager frameManager;
-	public Player playingWhite;
-	public Player playingBlack;
-	public GameRules gameRules;
-	
+	private GameRules gameRules;
 	public int round;
 	public boolean gameStart=false;
 	public static int countMoves;
 
-	
+	/**
+	 *	Konstruktor klasy {@link GameLog} tworzy obiekt klast {@link FrameManager}.
+
+	 */
 	public Game()
 	{
-		playingWhite=new Player("white");
-		playingBlack=new Player("black");
-		gameRules=new GameRules();
 		frameManager=new FrameManager();	
 	}
 
-	
+	/**
+	 *	Funkcja ustawia liczbê rund i ruchów oraz przygotowuje okno oraz szachownicê za pomoc¹ obiektu {@link FrameManager}.
+
+	 */
 	public void startGame()
 	{
 		round=0;
 		countMoves=0;
 		frameManager.prepareGui(this);
-		gameRules.initialize();
 		frameManager.prepareChessboard();
 	
 	}
+	/**
+	 *	Funkcja ustawia stan gry na zakoñczony i koñczy grê pomoc¹ funkcji obiektu {@link FrameManager}.
+
+	 */
 	public void endGame()
 	{
 		gameStart=false;
-		gameRules.clearGameRules();
 		frameManager.endGame();
 		
 	}
 	
-	public void setGameStart()
+	/**
+	 *	Funkcja ustawia stan gry.
+	 *@param gameRules zasady gry
+
+	 */
+	public void setGameStart(GameRules gameRules)
 	{
+		this.gameRules=gameRules;
 		gameStart=true;
 	}
-	
+	/**
+	 *	Funkcja wykonuje ruch w "wirtualnej" tablicy {@link GameRules}. Zarz¹dza równie¿ liczbami ruchów i rund.
+	 *
+	 *@param piece pbierka wykonuj¹ca ruch
+	 *@param rank wiersz na który ustawiana jest bierka
+	 *@param file kolumna na któr¹ ustawiana jest bierka
+	 */
 	public void makeMove(Piece piece,int rank,char file)
 	{
-		gameRules.Pieces[rank][Piece.fileNumber(file)]=piece;
-		gameRules.Pieces[piece.rank][Piece.fileNumber(piece.file)]=null;
+		System.out.println(rank);
+		gameRules.setPiece(rank, Piece.fileNumber(file), piece);
+		gameRules.setPiece(piece.rank, Piece.fileNumber(piece.file), null);
 		if(countMoves%2==0)
 			++round;	
 		++countMoves;
 			
 	}
-	
+	/**
+	 *	Funkcja zapisuj¹ca do pliku o nazwie podanej w parametrze, aktualny stan gry.
+	 *
+	 *@param fileName nazwa nowego zapisu gry
+	 */
 	public void saveGame(String fileName)
 	{
 		try
@@ -76,13 +109,18 @@ public class Game {
 			}
 			writer.flush();
 			writer.close();
+			frameManager.menuBar.addJlistElement(fileName+".txt");
 			
-			System.out.print(fileName);
 		}catch (Exception e){
 		      System.err.println("Error: " + e.getMessage());
 	    }
 	}
 	
+	/**
+	 *	Funkcja wczytuj¹ca zapisan¹ grê z pliku o nazwie podanej w parametrze.
+	 *
+	 *@param fileName nazwa zapisu gry do wczytania
+	 */
 	public void readGame(String fileName)
 	{
 		try

@@ -9,6 +9,10 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.text.Highlighter.Highlight;
+
+import org.omg.CORBA.INITIALIZE;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -23,16 +27,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Klasa {@link ChessBoard} odpowiada za rysowanie i interakcje z polem szachownicy oraz jest pierwsz¹ funkcj¹ przetwarzaj¹c¹ ruchy bierk¹.<br>
+ * Implementuje {@link MouseListener} <br>
+ * Zawiera pola takie jak :<br>
+ * {@link FrameManager} - kotroler aplikacji<br>
+ * {@link GameRules} - kontroler zasad gry<br>
+ * highlited  - informacja czy podœwietlone jest mozliwy ruch bierki<br>
+ * movingPiece - aktualnie wybrana bierka<br>
+ * options - mo¿liwe do wykonania ruchy<br>
+ * Squares - tablica pól szachownicy<br>
+ * light - ustawiony kolor jasnych pól <br>
+ * dark - ustawiony kolor ciemnych pól <br>
+  * @see JPanel
+ */ 
 public class ChessBoard extends JPanel implements MouseListener{
 	
 	private FrameManager frameManager;
-	private Player playingWhite;
-	private Player playingBlack;
 	private GameRules gameRules;
 	
 	private boolean highlited=false;
 	public Piece movingPiece=null;
-	private Color color;
 	private ArrayList<ToHighlight> options;
 
 	
@@ -40,24 +55,23 @@ public class ChessBoard extends JPanel implements MouseListener{
 	public Square[][] Squares;
 	Color light=new Color(153,160,0,200);
 	Color dark=new Color(204,255,204,100);
+	/**
+	 *	Konstruktor klasy {@link ChessboardSpot} ustawia layout szachownicy oraz j¹ inicjalizuje.
+	*	@param frameManager kontroler aplikacji	
+	 */
 	
 	public ChessBoard(FrameManager frameManager)
 	{
 		this.frameManager=frameManager;
-		this.gameRules=frameManager.game.gameRules;
-
-		for(int i=0;i<9;++i)
-			for(int j=0;j<9;++j)
-			{
-				if(gameRules.Pieces[i][j]!=null)
-					System.out.println(gameRules.Pieces[i][j]);
-			}
 		options= new ArrayList<GameRules.ToHighlight>();
 		setLayout(new GridLayout(9,9,3,3));
 		Squares=new Square[9][9];
 		initialize();
 		
 	}
+	/**
+	 *	Funkcja initialize, dodaje {@link MouseListener} do poszczególnych pól szachownicy i inicjalizuje je, ustawia kolor i opis planszy.
+	 */
 	
 	private void initialize()
 	{
@@ -108,10 +122,16 @@ public class ChessBoard extends JPanel implements MouseListener{
 		}
 	}
 	
-	public void addPawns()
+	/**
+	 *	Funkcja addPawns dodaje bierki na planszê ustawiaj¹c je w domyœlnej konfiguracji.
+	 *@param playingWhite graj¹cy bia³ymi
+	 *@param playingBlack graj¹cy czarnymi
+	 *@param gameRules zasady gry
+	 */
+	
+	public void addPawns(Player playingWhite,Player playingBlack,GameRules gameRules)
 	{
-		this.playingBlack=frameManager.game.playingBlack;
-		this.playingWhite=frameManager.game.playingWhite;
+		this.gameRules=gameRules;
 		for(int i=1;i<9;++i)
 		{
 			Squares[2][i].add(playingWhite.CurrentPiece("whitePawn"+i));
@@ -137,7 +157,20 @@ public class ChessBoard extends JPanel implements MouseListener{
 		Squares[8][7].add(playingBlack.CurrentPiece("blackKnight2"));
 		Squares[8][8].add(playingBlack.CurrentPiece("blackRook2"));	
 		
+	
+			for(int j=1;j<9;++j)
+			{
+				Squares[1][j].setOccupied(true);
+				Squares[2][j].setOccupied(true);
+				Squares[7][j].setOccupied(true);
+				Squares[8][j].setOccupied(true);
+			}
 	}
+	
+	/**
+	 *	Funkcja czyœci szachownicê z bierek przed ponown¹ rozgrywk¹.
+	 */
+	
 	public void clearChessboard()
 	{
 		for(int i=8;i>=1;--i)
@@ -147,10 +180,17 @@ public class ChessBoard extends JPanel implements MouseListener{
 				if(!checkIfEmpty(Square.numberFile(j), i))
 					Squares[i][j].remove((Piece)Squares[i][j].getComponent(0));
 				Squares[i][j].unhiglitedSquare();
+				
 			}
 		}
 		movingPiece=null;
 	}
+	/**
+	 *	Funkcja przetwarza wszystkie klikniêcia na szachownicy. Jeœli wybrano bierkê aktualnie graj¹cego gracza to wyœwietla jej mo¿liwe ruchy. <br>
+	 * Jeœli wtedy klikniemy na inn¹ bierk¹ aktualnie graj¹cego to pokazujemy jej mo¿liwe ruchy. Jeœli po wyœwietleniu ruchu klikniemy przeciwn¹ bierkê, <br>
+	 * to albo wykonane zostanie bicie (jeœli mo¿liwe) albo nic siê nie dzieje.
+	 *@param square kliknête pole 
+	 */
 	
 	public void processClick(Square square)
 	{
@@ -172,8 +212,6 @@ public class ChessBoard extends JPanel implements MouseListener{
 		else
 		{
 			Piece piece=(Piece)square.getComponent(0);
-			System.out.println(square.file+" "+square.rank);
-			System.out.println(piece.file+" "+piece.rank);
 			if(movingPiece!=null) //bicie piona
 			{
 				if(frameManager.beatPiece(movingPiece,square.file,square.rank, options,piece))
@@ -199,10 +237,8 @@ public class ChessBoard extends JPanel implements MouseListener{
 				unhighlightLegalMoves();
 				revalidate();
 				repaint();
-			}
-			
+			}		
 			highlited=true; //podswietlenie mozliwosci
-			color=Squares[square.rank][Square.fileNumber(square.file)].getBackground();
 			Squares[square.rank][Square.fileNumber(square.file)].higlitedSquare();
 			movingPiece=piece;
 			highlightLegalMoves();
@@ -210,6 +246,9 @@ public class ChessBoard extends JPanel implements MouseListener{
 			repaint();
 		}
 	}
+	/**
+	 *	Funkcja pdœwietla wszyskie mo¿liwe ruchy wybranej bierki.
+	 */
 	
 	public void highlightLegalMoves()
 	{
@@ -225,6 +264,36 @@ public class ChessBoard extends JPanel implements MouseListener{
 			Squares[rank][Square.fileNumber(file)].higlitedSquare();
 		}	
 	}
+	/**
+	 *	Funkcja ustawia szach na wybranym Królu.
+	 *@param color kolor Króla który zostaje zaszachowny.
+	 */
+
+	public void setKingCheck(boolean color)
+	{
+		for(int i=1;i<9;++i)
+			for(int j=1;j<9;++j)
+			{
+				if(Squares[i][j].getOccupied())
+				{
+					Piece piece=(Piece)Squares[i][j].getComponent(0);
+					if(piece instanceof King)
+					{
+						if(color==piece.color)
+							continue;
+						else
+						{
+							King king=(King)piece;
+							king.check=true;
+						}
+					}
+				}
+			}
+	}
+	/**
+	 *	Funkcja odznacza mo¿liwe ruchy bierki.
+	 */
+	
 	
 	public void unhighlightLegalMoves()
 	{
@@ -239,6 +308,14 @@ public class ChessBoard extends JPanel implements MouseListener{
 			Squares[rank][Square.fileNumber(file)].unhiglitedSquare();
 		}
 	}
+	
+	/**
+	 *	Funkcja sprawdza czy dane pole jest puste.
+	 *@param file kolumna pola
+	 *@param rank wiersz pola
+	 *@return zwraca prawdê jeœli pole puste
+	 */
+
 	public boolean checkIfEmpty(char file,int rank)
 	{
 		
@@ -247,15 +324,20 @@ public class ChessBoard extends JPanel implements MouseListener{
 		else 
 			return false;
 	}
-	
+	/**
+	 *	Nadpisana metoda pozwalaj¹ca na rysowanie pola
+	 *
+	 * @param g informacje potrzebne do rysowania
+	 * @see         Graphics
+	 */
 
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 	}
+	
 	public void mousePressed(MouseEvent e) {
 	    }
-
 	    public void mouseReleased(MouseEvent e) {
 	    }
 
@@ -264,11 +346,14 @@ public class ChessBoard extends JPanel implements MouseListener{
 
 	    public void mouseExited(MouseEvent e) {
 	    }
-
+		/**
+		 *	Funkcja procesuj¹ca klikniêcie.
+		 * Wywo³uje processClick który kontroluje ruch bierki na szachownicy.
+		 */
+	    
 	    public void mouseClicked(MouseEvent e) {
 	    	if(!frameManager.game.gameStart)
 	    		return;
-	    	e.getClickCount();
 	    	Square square=(Square)e.getComponent();
 	    	//System.out.println(square.file+" "+square.rank);
 	    	processClick(square);

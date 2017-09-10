@@ -17,20 +17,42 @@ import javax.swing.JOptionPane;
 import java.io.*;
 import javax.swing.JLabel;
 import java.awt.event.*;
+import javax.swing.DefaultListModel;
 
+/**
+ * Klasa {@link MenuBar} zawiera kontroler menu gry.<br>
+ * Grê mo¿emy zacz¹æ od nowa w ka¿dym momencie. <br>
+ * Grê mo¿emy wczytaæ i zapisaæ do pliku aby potem do niej wróciæ.
+ * Zawiera takie pola jak:<br>
+ * {@link JList} - która zawiera listê mo¿liwych ger do wczytania<br>
+ * gameStarted - informacje o tym czy aktualnie jest otwarta rozgrywka<br>
+ * fileName - nazwê pliku do zapisania<br>
+ * ifRead - sprawdzenie, ¿e u¿ytkownik wie, ¿e utraci grê<br>
+ * {@link DefaultListModel} - model menu z zapisanymi grami <br>
+  * @see JPanel
+ */ 
 public class MenuBar extends JPanel{
 	
-	private JList list;
-	private FrameManager frameManager;
+	private JList<String> list;
 	private boolean gameStarted=false;
 	private String fileName=null;
 	private int ifRead=1;
+	private DefaultListModel<String> model;
+	
+	/**
+	 * Konstruktor {@link MenuBar} ustawia layout Menu. Dodaje przyciski odpowiedzialne za:<br>
+	 * Now¹ grê <br>
+	 * Wczytanie gry<br>
+	 * Zapis gry<br>
+	 * oraz pole które wyœwietla zapisane gry.
+	 * @param frameManager kontroler aplikacji
+	 */ 
 	
 	public MenuBar(FrameManager frameManager){
 		
-
-		this.frameManager=frameManager;
-		list=new JList<String>(readSavedGames());
+		model = new DefaultListModel<String>();
+		initModel(readSavedGames());
+		list=new JList<String>(model);
 		list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setLayoutOrientation(JList.VERTICAL);
@@ -58,11 +80,13 @@ public class MenuBar extends JPanel{
 	        {
 	        	if(!gameStarted)
 	        	{
+	        		frameManager.gameLog.clearLog();
 	        		frameManager.startGame();
 	        		gameStarted=true;
 	        	}
 	        	else
 	        	{
+	        		//System.out.println("tak");
 	        		frameManager.game.endGame();
 	        		gameStarted=false;
 	        		
@@ -81,6 +105,7 @@ public class MenuBar extends JPanel{
 	        {
 	        	if(frameManager.game.gameStart)
 	        	{
+	        		frameManager.gameLog.clearLog();
 	        		ifRead=JOptionPane.showConfirmDialog(null, new JLabel("Utracisz aktualn¹ grê. Chcesz Kontynuowaæ?"),"Wczytaj", JOptionPane.YES_NO_OPTION);
 	        			
 	        		if(ifRead==0)
@@ -89,6 +114,7 @@ public class MenuBar extends JPanel{
 	        			{
 	        				frameManager.game.readGame((String)list.getSelectedValue());
 	        				ifRead=1;
+	        				setGameStarted(true);
 	        			}
 	        		}
 	        		else
@@ -131,7 +157,34 @@ public class MenuBar extends JPanel{
 	
 		
 	}
+	/**
+	 * Funkcja dodaje do modelu zapisane pliki z grami
+	 * @param files tablica zapisanych plików
+	 */ 
 	
+	
+	public void initModel(String[] files)
+	{
+		for(String string : files)
+		{
+			model.addElement(string);
+		}
+	}
+	/**
+	 * Funkcja dodaje do listy now¹ zapisan¹ grê.
+	 * @param string nazwa zapisu
+	 */ 
+	
+	public void addJlistElement(String string)
+	{
+		model.addElement(string);
+		list.setModel(model);
+	}
+	
+	/**
+	 * Funkcja czyta z folderu wszystkie zapisane gry.
+	 * @return tablica stringów zapisanych gier
+	 */ 
 	public String[] readSavedGames()
 	{		
 		File file=new File("saves/");
@@ -158,6 +211,11 @@ public class MenuBar extends JPanel{
 		
 		return returnFiles;
 	}
+	
+	/**
+	 * Funkcja ustawia stan rozpoczêcia gry.
+	 * @param value wartoœæ do ustawienia 
+	 */ 
 	
 	public void setGameStarted(boolean value)
 	{

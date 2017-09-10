@@ -2,12 +2,18 @@ package chessGame;
 import pawns.*;
 import java.util.HashMap;
 	
-
+/**
+ * Klasa {@link Player} zawiera w sobie Mapê bierek które s¹ aktualnie na szachownicy. Dziêki niej nie wystêpuje duplikacja przy ruchu.
+ */ 
 public class Player {
 	
 	public boolean color;
 	public HashMap<String,Piece> player;
 	
+	/**
+	 *	Konstruktor klasy Player powo³uje do ¿ycia i dodaje do mapy wszystkei bierki ustawiane nastêpnie na szachownicy.
+	*	@param stringColor string  zawieraj¹cy kolor gracz(bierek)
+	 */
 	public Player(String stringColor)
 	{
 		if(stringColor=="white")
@@ -48,7 +54,12 @@ public class Player {
 		
 		
 	}
-
+	
+	/**
+	 *	Funkcja zwraca wartoœæ po przekazanym kluczu.
+	*	@param name nazwa klucza danej wartoœci
+	*@return name zwraca {@link Piece}
+	 */
 
 	public Piece CurrentPiece(String name)
 	{

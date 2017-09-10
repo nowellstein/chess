@@ -4,8 +4,18 @@ import java.util.ArrayList;
 
 import pawns.GameRules.ToHighlight;
 
+/**
+ * Klasa {@link Knight} dziedzicz¹ca po Piece odpowiada za skoczka w szachach.
+ *	@see Piece
+ */ 
 public class Knight extends Piece{
 	static int count=0;
+	
+	/**
+	 *	Konstruktor klasy Knight który ustawia miejsce startowe szkoczka na szachownicy.
+	 *
+	 * @param  color kolor skoczka wyra¿ony typem boolean
+	 */
 	public Knight(boolean color){
 		super("knight",color);
 		if(count==2)
@@ -17,6 +27,14 @@ public class Knight extends Piece{
 			this.rank=8;
 		
 	}
+	/**
+	 *	Funkcja która odpowiada za ruch skoczkiem. Przyjmnuje obiekt skoczka i stan szachownicy. <br>
+	 *	Przy pomocy dodatkowych funkcji okreœla miejsca na które mo¿e udaæ siê królowa.
+	 *
+	 * @param  knight jest to obiekt skoczka którego mo¿liwe ruchy zostan¹ znalezione
+	 * @param  pieces wyra¿a aktualny stan szachownicy
+	 * @return zwraca listê mo¿liwych ruchów
+	 */
 	
 	public ArrayList<GameRules.ToHighlight> moveKnight(Knight knight,Piece[][] pieces)
 	{
@@ -85,6 +103,14 @@ public class Knight extends Piece{
 		}
 		return moves;
 	}
+	/**
+	 *	Funkcja sprawdza czy skoczek mo¿e poruszyæ siê o dwa pola do góry i jedno w prawo.
+	 *
+	 * @param  rank jest to numer wiersza skoczka
+	 * @param  file jest to numer kolumny skoczka
+	 * @param  pieces wyra¿a aktualny stan szachownicy
+	 * @return prawdê jeœli ruch wykonalny
+	 */
 	
 	public boolean moveUpRight(int rank,int file,Piece[][] pieces)
 	{
@@ -96,6 +122,14 @@ public class Knight extends Piece{
 			return true;
 			
 	}
+	/**
+	 *	Funkcja sprawdza czy skoczek mo¿e poruszyæ siê o dwa pola do góry i jedno w lewo.
+	 *
+	 * @param  rank jest to numer wiersza skoczka
+	 * @param  file jest to numer kolumny skoczka
+	 * @param  pieces wyra¿a aktualny stan szachownicy
+	 * @return prawdê jeœli ruch wykonalny
+	 */
 	
 	public boolean moveUpLeft(int rank,int file,Piece[][] pieces)
 	{
@@ -107,6 +141,15 @@ public class Knight extends Piece{
 			return true;
 			
 	}
+	
+	/**
+	 *	Funkcja sprawdza czy skoczek mo¿e poruszyæ siê o dwa pola w dól i jedno w prawo.
+	 *
+	 * @param  rank jest to numer wiersza skoczka
+	 * @param  file jest to numer kolumny skoczka
+	 * @param  pieces wyra¿a aktualny stan szachownicy
+	 * @return prawdê jeœli ruch wykonalny
+	 */
 
 	public boolean moveDownRight(int rank,int file,Piece[][] pieces)
 	{
@@ -119,6 +162,15 @@ public class Knight extends Piece{
 			
 	}
 	
+	/**
+	 *	Funkcja sprawdza czy skoczek mo¿e poruszyæ siê o dwa pola w dól i jedno w lewo.
+	 *
+	 * @param  rank jest to numer wiersza skoczka
+	 * @param  file jest to numer kolumny skoczka
+	 * @param  pieces wyra¿a aktualny stan szachownicy
+	 * @return prawdê jeœli ruch wykonalny
+	 */
+	
 	public boolean moveDownLeft(int rank,int file,Piece[][] pieces)
 	{
 		if(rank-2<1 || file-1<1)
@@ -130,6 +182,15 @@ public class Knight extends Piece{
 			
 	}
 	
+	/**
+	 *	Funkcja sprawdza czy skoczek mo¿e poruszyæ siê o dwa pola w prawo i jedno w dó³.
+	 *
+	 * @param  rank jest to numer wiersza skoczka
+	 * @param  file jest to numer kolumny skoczka
+	 * @param  pieces wyra¿a aktualny stan szachownicy
+	 * @return prawdê jeœli ruch wykonalny
+	 */
+	
 	public boolean moveRightDown(int rank,int file,Piece[][] pieces)
 	{
 		if(rank-1<1 || file+2>8)
@@ -139,6 +200,16 @@ public class Knight extends Piece{
 		else
 			return true;
 	}
+	
+	/**
+	 *	Funkcja sprawdza czy skoczek mo¿e poruszyæ siê o dwa pola w prawo i jedno w górê.
+	 *
+	 * @param  rank jest to numer wiersza skoczka
+	 * @param  file jest to numer kolumny skoczka
+	 * @param  pieces wyra¿a aktualny stan szachownicy
+	 * @return prawdê jeœli ruch wykonalny
+	 */
+	
 	
 	public boolean moveRightUp(int rank,int file,Piece[][] pieces)
 	{
@@ -150,6 +221,15 @@ public class Knight extends Piece{
 			return true;
 	}
 	
+	/**
+	 *	Funkcja sprawdza czy skoczek mo¿e poruszyæ siê o dwa pola w lewo i jedno w górê.
+	 *
+	 * @param  rank jest to numer wiersza skoczka
+	 * @param  file jest to numer kolumny skoczka
+	 * @param  pieces wyra¿a aktualny stan szachownicy
+	 * @return prawdê jeœli ruch wykonalny
+	 */
+	
 	public boolean moveLeftUp(int rank,int file,Piece[][] pieces)
 	{
 		if(rank+1>8 || file-2<1)
@@ -159,6 +239,15 @@ public class Knight extends Piece{
 		else
 			return true;
 	}
+	
+	/**
+	 *	Funkcja sprawdza czy skoczek mo¿e poruszyæ siê o dwa pola w lewo i jedno w dó³.
+	 *
+	 * @param  rank jest to numer wiersza skoczka
+	 * @param  file jest to numer kolumny skoczka
+	 * @param  pieces wyra¿a aktualny stan szachownicy
+	 * @return prawdê jeœli ruch wykonalny
+	 */
 	
 	public boolean moveLeftDown(int rank,int file,Piece[][] pieces)
 	{

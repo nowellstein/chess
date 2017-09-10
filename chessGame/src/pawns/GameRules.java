@@ -7,18 +7,33 @@ import java.util.List;
 
 import gui.Square;
 
+/**
+ * Klasa {@link GameRules} odpowiada po czêœci za przebieg gry. W niej zawarte s¹ zasady na jakich piony mog¹ poruszaæ siê po szachownicy.<br>
+ * Zawiera pole które przechowuje "wirtualny" stan przebiegu gry.
+ */ 
+
 public class GameRules {
 	
-	public Piece [][]Pieces;
+	private Piece [][]Pieces;	
 	
+	/**
+	 *	Konstruktor klasy GameRules, ustawia na wszystkich polach wartoœæ null aby pózniej odró¿niæ gdzie stoi a gdzie nie dana bierka.
+	 *
+	 */
 	public GameRules()
 	{
 		Pieces=new Piece[9][9];
 		for(int i=0;i<9;++i)
 			for(int j=0;j<9;++j)
 				Pieces[i][j]=null;	
+		initialize();
 	}
 	
+	
+	/**
+	 *	Inicjalizuje tablicê bierek za pomoc¹ startowego ustawienia szachownicy.
+	 *
+	 */
 	public void initialize()
 	{
 		int count=0;
@@ -96,6 +111,10 @@ public class GameRules {
 		Pieces[8][4]=queen2;
 	
 	}
+	/**
+	 *	Ustawia ponownie wszystkie elementy tablicy na null.
+	 *
+	 */
 	public void clearGameRules()
 	{
 		for(int i=0;i<9;++i)
@@ -103,39 +122,34 @@ public class GameRules {
 				Pieces[i][j]=null;	
 	}
 	
+	/**
+	 *	Klasa ToHighlight stanowi de facto kontener zawieraj¹cy informacje o polu które nale¿y podœwietliæ. 
+	 * Sk³ada siê ze jednej zmiennej int i jednej zmiennej char.
+	 *
+	 */
+	
 	public static class ToHighlight
 	{
 		public int rank=0;
 		public char file=0;
 
-		public ToHighlight()
-		{
-			
-		}
 	}
+	
+	/**
+	 *	Funkcja sprawdza instancj¹ jakiej bierki jest przekazany do funkcji obiekt a nastêpnie przy pomocy klas danych bierek okreœla listê mo¿liwych ruchów.
+	 * 
+	 *@param piece bierka której mo¿liwe ruchy funkcja bêdzie zwracaæ
+	 *
+	 *@return Zwraca listê mo¿liwych ruchów do wykonania.
+	 */
 	
 	public ArrayList<ToHighlight> returnLegalMoves(Piece piece)
 	{	
 		ArrayList<ToHighlight> moves = new ArrayList<ToHighlight>();
-		ArrayList<ToHighlight> illegalmoves = new ArrayList<ToHighlight>();
 		if(piece instanceof Pawn)
 		{
 			piece=(Pawn)piece;
 			moves=((Pawn) piece).movePawn((Pawn)piece,Pieces); //ruchy ktore moze zrobic pion
-			//illegalmoves=returnIllegalMoves((Pawn)piece, moves);
-		/*	for(int i=0;i<illegalmoves.size();++i)
-			{
-				System.out.println("co do chuj");
-				ToHighlight deleteMove=new ToHighlight();
-				deleteMove=illegalmoves.get(i);
-				for(int j=0;j<moves.size();++j)
-				{
-					ToHighlight checkMove=new ToHighlight();
-					if(checkMove.file==deleteMove.file && checkMove.rank==deleteMove.rank)
-						moves.remove(j);
-				}
-			}*/
-			
 		}
 		if(piece instanceof Knight)
 		{
@@ -162,79 +176,79 @@ public class GameRules {
 			piece=(King)piece;
 			moves=((King) piece).moveKing((King)piece,Pieces);
 		}
+		System.out.println(moves.size());
+		for(int i=0;i<moves.size();++i)
+		{
+			King king=returnKing(piece.color);
+			ToHighlight move=new ToHighlight();
 
+			move=moves.get(i);
+			/*if(king.checkUpRight(piece, move.rank, Piece.fileNumber(move.file), Pieces))
+				moves.remove(i);*/
+			/*else if(king.checkUpLeft(piece, move.rank, Piece.fileNumber(move.file), Pieces))
+				moves.remove(i);
+			else if(king.checkDownRight(piece, move.rank, Piece.fileNumber(move.file), Pieces))
+				moves.remove(i);
+			else if(king.checkDownLeft(piece, move.rank, Piece.fileNumber(move.file), Pieces))
+				moves.remove(i);
+			else if(king.checkLeft(piece, move.rank, Piece.fileNumber(move.file), Pieces))
+				moves.remove(i);*/
+		}
+		System.out.println(moves.size());
 		
 		
 		return moves;
 	}
-	
-	public void deleteMoves(ArrayList<ToHighlight> moves, ArrayList<ToHighlight> illegalMoves)
+	/**
+	 *	Funkcja znajduje i zwraca Króla o wybranym kolorze.
+	 * 
+	 *@param color kolor szukanego Króla
+	 *
+	 *@return zwraca wybranego Króla
+	 */
+	public King returnKing(boolean color)
 	{
-		
-		
-	}
-	
-	public ArrayList<ToHighlight> returnIllegalMoves(Piece piece,ArrayList<ToHighlight> moves)
-	{
-		ArrayList<ToHighlight> illegamlMoves = new ArrayList<ToHighlight>();
-		ArrayList<ToHighlight> possibleFutureMoves = new ArrayList<ToHighlight>();
-		
-		int size=moves.size();
-		Piece[][] possibleMoves=new Piece[9][9];
-		possibleMoves=Pieces;
-		if(piece instanceof Pawn)
-		{
-			for(int k=0;k<size;++k)
+		for(int i=1;i<9;++i)
+			for(int j=1;j<9;++j)
 			{
-				ToHighlight futureMove=new ToHighlight();
-				futureMove=moves.get(k);
-				possibleMoves[futureMove.rank][Piece.fileNumber(futureMove.file)]=(Pawn)piece;
-				for(int i=1;i<9;++i)
-					for(int j=1;j<9;++j)
-					{
-						if(possibleMoves[i][j]!=null && possibleMoves[i][j].color!=piece.color)
-						{
-							possibleFutureMoves=returnLegalMoves(possibleMoves[i][j]);
-							for(int l=0;l<possibleFutureMoves.size();++l)
-							{
-								ToHighlight check=new ToHighlight();
-								check=possibleFutureMoves.get(l);
-								if(possibleMoves[check.rank][Piece.fileNumber(check.file)] instanceof King && possibleMoves[check.rank][Piece.fileNumber(check.file)].color==piece.color)
-									System.out.println("nie");
-									//illegamlMoves.add(check);
-							}
-						}
-					}
-				
+				if(Pieces[i][j]!=null)
+				{
+					if(Pieces[i][j] instanceof King && Pieces[i][j].color==color)
+						return (King)Pieces[i][j];
+				}
 			}
-			
-		}
-		/*if(piece instanceof Knight)
-		{
-			piece=(Knight)piece;
-			moves=((Knight) piece).moveKnight((Knight)piece,Pieces);
-		}
-		if(piece instanceof Rook)
-		{
-			piece=(Rook)piece;
-			moves=((Rook) piece).moveRook((Rook)piece,Pieces);
-		}
-		if(piece instanceof Bishop)
-		{
-			piece=(Bishop)piece;
-			moves=((Bishop) piece).moveBishop((Bishop)piece,Pieces);
-		}
-		if(piece instanceof Queen)
-		{
-			piece=(Queen)piece;
-			moves=((Queen) piece).moveQueen((Queen)piece,Pieces);
-		}
-		if(piece instanceof King)
-		{
-			piece=(King)piece;
-			moves=((King) piece).moveKing((King)piece,Pieces);
-		}*/
-		return illegamlMoves;
+		return null;
 	}
 	
+	/**
+	 *	Funkcja znajduje i zwraca bierkê z danego miejsca.
+	 * 
+	 *@param rank numer wiersza szachownicy
+	 *@param file numer kolumny szachowniy
+	 *@return zwraca wybran¹ bierkê
+	 */
+	public Piece getPiece(int rank,int file)
+	{
+		return this.Pieces[rank][file];
+	}
+	/**
+	 *	Funkcja ustawia bierkê na danym polu.
+	 * 
+	 *@param rank numer wiersza szachownicy
+	 *@param file numer kolumny szachowniy
+	 *@param piece bierka do ustawienia
+	 */
+	public void setPiece(int rank,int file,Piece piece)
+	{
+		this.Pieces[rank][file]=piece;
+	}
+	/**
+	 *	Funkcja zwraca tablicê z ustawionymi bierkami.
+	 *@return tablica {@link Piece}
+	 */	
+	public Piece[][] returnPieces()
+	{
+		return this.Pieces;
+	}
 }
+

@@ -24,15 +24,23 @@ import java.awt.EventQueue;
 import java.lang.Exception;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
+/**
+ * Klasa {@link Window} ustawia okno aplikacji.
+  * @see JPanel
+ */ 
 public class Window extends JFrame{
+	/**
+	 * Kontruktor klasy {@link Window} inicjalizuje okno.
+	 */ 
 	
-
 	public Window()
 	{
-		setBackground(Color.DARK_GRAY);
 		initialize();
 	}
+	
+	/**
+	 * Funkcja ustawia granice, przycisk zamkniêcia i layout okna.
+	 */ 
 	
 	private void initialize() {
 		setBounds(100, 100, 900, 600);
@@ -40,7 +48,10 @@ public class Window extends JFrame{
 		getContentPane().setLayout(new GridLayout(1, 0, 0, 0));
 		setVisible(true);
 	}
-	
+	/**
+	 * Funkcja dodaje {@link JLayeredPane} do okna.
+	 * @param pane dodawany sektor
+	 */ 
 	public void addJLayeredPane(JLayeredPane pane)
 	{
 		getContentPane().add(pane);
